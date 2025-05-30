@@ -2,6 +2,7 @@ import { TaskInput } from "@/components/task-input";
 import { TaskBoard } from "@/components/task-board";
 import { TaskStats } from "@/components/task-stats";
 import { MeetingMinutes } from "@/components/meeting-minutes";
+import { ManualTaskForm } from "@/components/manual-task-form";
 import { useQuery } from "@tanstack/react-query";
 import { type Task } from "@shared/schema";
 import { useState } from "react";
@@ -54,8 +55,8 @@ export default function Home() {
                   : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
               }`}
             >
-              <i className="fas fa-plus-circle mr-2"></i>
-              Single Task Input
+              <i className="fas fa-magic mr-2"></i>
+              AI Task Input
             </button>
             <button
               onClick={() => setActiveTab("meeting")}
@@ -68,12 +69,24 @@ export default function Home() {
               <i className="fas fa-users mr-2"></i>
               Meeting Minutes Parser
             </button>
+            <button
+              onClick={() => setActiveTab("manual")}
+              className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "manual"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+              }`}
+            >
+              <i className="fas fa-plus-circle mr-2"></i>
+              Manual Entry
+            </button>
           </nav>
         </div>
 
         {/* Tab Content */}
         {activeTab === "single" && <TaskInput />}
         {activeTab === "meeting" && <MeetingMinutes />}
+        {activeTab === "manual" && <ManualTaskForm />}
         
         <TaskBoard tasks={tasks} isLoading={isLoading} />
         <TaskStats tasks={tasks} />
