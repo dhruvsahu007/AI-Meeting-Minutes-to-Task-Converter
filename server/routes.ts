@@ -1,8 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertTaskSchema, updateTaskSchema, parseTaskSchema } from "@shared/schema";
-import { parseNaturalLanguageTask } from "./openai";
+import { insertTaskSchema, updateTaskSchema, parseTaskSchema, parseTranscriptSchema } from "@shared/schema";
+import { parseNaturalLanguageTask, parseMeetingTranscript } from "./openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all tasks
@@ -52,11 +52,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const task = await storage.createTask(validatedTask);
       
       res.json(task);
-    } catch (error) {
+    } catch (error: any) {
       if (error.name === "ZodError") {
         return res.status(400).json({ message: "Invalid input data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to parse and create task" });
+    }
+  });
+
+  // Parse meeting transcript and create multiple tasks
+  app.post("/api/tasks/parse-transcript", async (req, res) => {
+    try {
+      const validatedInput = parseTranscriptSchema.parse(req.body);
+      
+      // Parse meeting transcript using OpenAI
+      const parsedResult = await parseMeetingTranscript(validatedInput.transcript);
+      
+      // Create all tasks from parsed data
+      const createdTasks = [];
+      for (const parsedTask of parsedResult.tasks) {
+        const taskData = {
+          name: parsedTask.taskName,
+          assignee: parsedTask.assignee,
+          dueDate: parsedTask.dueDate,
+          priority: parsedTask.priority,
+          status: "pending" as const,
+        };
+        
+        const validatedTask = insertTaskSchema.parse(taskData);
+        const task = await storage.createTask(validatedTask);
+        createdTasks.push(task);
+      }
+      
+      res.json({ tasks: createdTasks, count: createdTasks.length });
+    } catch (error) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({ message: "Invalid transcript data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to parse transcript and create tasks" });
     }
   });
 

@@ -30,6 +30,13 @@ export const parseTaskSchema = z.object({
 
 export type ParseTaskInput = z.infer<typeof parseTaskSchema>;
 
+// Schema for meeting transcript parsing input
+export const parseTranscriptSchema = z.object({
+  transcript: z.string().min(1, "Meeting transcript cannot be empty"),
+});
+
+export type ParseTranscriptInput = z.infer<typeof parseTranscriptSchema>;
+
 // Schema for parsed task result from OpenAI
 export const parsedTaskResultSchema = z.object({
   taskName: z.string(),
@@ -39,3 +46,10 @@ export const parsedTaskResultSchema = z.object({
 });
 
 export type ParsedTaskResult = z.infer<typeof parsedTaskResultSchema>;
+
+// Schema for multiple parsed tasks from meeting transcript
+export const parsedTranscriptResultSchema = z.object({
+  tasks: z.array(parsedTaskResultSchema),
+});
+
+export type ParsedTranscriptResult = z.infer<typeof parsedTranscriptResultSchema>;

@@ -1,8 +1,10 @@
 import { TaskInput } from "@/components/task-input";
 import { TaskBoard } from "@/components/task-board";
 import { TaskStats } from "@/components/task-stats";
+import { MeetingMinutes } from "@/components/meeting-minutes";
 import { useQuery } from "@tanstack/react-query";
 import { type Task } from "@shared/schema";
+import { useState } from "react";
 
 export default function Home() {
   const { data: tasks = [], isLoading } = useQuery<Task[]>({
