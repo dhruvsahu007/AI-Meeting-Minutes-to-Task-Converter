@@ -85,7 +85,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       res.json({ tasks: createdTasks, count: createdTasks.length });
-    } catch (error) {
+    } catch (error: any) {
       if (error.name === "ZodError") {
         return res.status(400).json({ message: "Invalid transcript data", errors: error.errors });
       }

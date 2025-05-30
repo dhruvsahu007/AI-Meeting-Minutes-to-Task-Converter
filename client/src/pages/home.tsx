@@ -7,6 +7,7 @@ import { type Task } from "@shared/schema";
 import { useState } from "react";
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState("single");
   const { data: tasks = [], isLoading } = useQuery<Task[]>({
     queryKey: ["/api/tasks"],
   });
@@ -42,7 +43,38 @@ export default function Home() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <TaskInput />
+        {/* Tab Navigation */}
+        <div className="mb-8">
+          <nav className="flex space-x-8" aria-label="Tabs">
+            <button
+              onClick={() => setActiveTab("single")}
+              className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "single"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+              }`}
+            >
+              <i className="fas fa-plus-circle mr-2"></i>
+              Single Task Input
+            </button>
+            <button
+              onClick={() => setActiveTab("meeting")}
+              className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "meeting"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+              }`}
+            >
+              <i className="fas fa-users mr-2"></i>
+              Meeting Minutes Parser
+            </button>
+          </nav>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === "single" && <TaskInput />}
+        {activeTab === "meeting" && <MeetingMinutes />}
+        
         <TaskBoard tasks={tasks} isLoading={isLoading} />
         <TaskStats tasks={tasks} />
       </main>
